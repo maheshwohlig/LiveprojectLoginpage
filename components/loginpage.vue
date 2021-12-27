@@ -26,7 +26,6 @@
                   mx="2"
                   id="pass1"
                   v-model="password"
-                  pattern="[A-Za-z]{3}"
                   prepend-inner-icon="mdi-lock"
                   label="Password"
                   :type="show1 ? 'text' : 'password'"
@@ -35,21 +34,16 @@
                   @click:append="show1 = !show1"
                   required
                 ></v-text-field>
-                <NuxtLink to="/home">
-                  <v-btn
-                    rounded
-                    block
-                    :disabled="!isFormValid"
-                    @click="submit"
-                    class="
-                      decoration:none;background-color:
-                      deep-orange
-                      accent-3
-                    "
-                  >
-                    login
-                  </v-btn>
-                </NuxtLink>
+
+                <v-btn
+                  rounded
+                  v-bind:style="{ 'background-color': '#f53809' }"
+                  block
+                  :disabled="!isFormValid"
+                  @click="submit"
+                >
+                  login
+                </v-btn>
               </v-form>
               <v-card-text
                 >powered by
@@ -110,33 +104,41 @@ export default {
   },
   methods: {
     async submit() {
-      let result = await axios.post(
-        `https://users.zodexchange.com/api/member/playerLogin`,
-        {
+      await axios
+        .post(`https://users.zodexchange.com/api/member/playerLogin`, {
           username: this.username,
           password: this.password,
           siteOrigin: 'zodexchange.com',
-        }
-      )
+        })
+        .then((response) => {
+          let v = response.data.value
+          let user_name = JSON.parse(response.config.data)
+          localStorage.setItem('username-info', user_name.username)
+          localStorage.setItem('password-info', user_name.password)
 
-      let value = result.data.value
-
-      console.log('value...', result.data.value)
-      console.log('result...', result)
-
-      localStorage.setItem(
-        'username-info',
-        JSON.stringify(result.config.data),
-        console.log('<<<<<', result.config.data)
-      )
-
-      localStorage.setItem('password-info', JSON.stringify(result.config.data))
-
-      if (value) {
-        console.log('true...')
-        this.$router.push('/home')
-      }
+          if (v === true) {
+            this.$router.push('/home')
+          }
+        })
+        .catch(({ response: err }) => {
+          let v = err.data.value
+          alert('incorrect user')
+          if (v === false) {
+            this.$router.push('/')
+          }
+        })
     },
+    // console.log('value...', result.data.value)
+    // console.log('result...', result)
+
+    // localStorage.setItem(
+    //   'username-info',
+    //   JSON.stringify(result.config.data),
+    //   console.log('<<<<<', result.config.data)
+    // )
+
+    // localStorage.setItem('password-info', JSON.stringify(result.config.data))
+
     // async created() {
     // let result = await axios({
     //   method: 'POST',

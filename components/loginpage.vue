@@ -19,7 +19,7 @@
                   prepend-inner-icon="mdi-account"
                   v-model="username"
                   label="Username"
-                  :rules="rules.username"e
+                  :rules="rules.username"
                   required
                 ></v-text-field>
                 <v-text-field

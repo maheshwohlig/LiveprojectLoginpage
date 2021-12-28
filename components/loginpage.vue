@@ -78,7 +78,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import { mapActions } from 'vuex'
+
 export default {
   data() {
     return {
@@ -102,63 +104,34 @@ export default {
       },
     }
   },
+
   methods: {
-    async submit() {
-      await axios
-        .post(`https://users.zodexchange.com/api/member/playerLogin`, {
-          username: this.username,
-          password: this.password,
-          siteOrigin: 'zodexchange.com',
-        })
-        .then((response) => {
-          let v = response.data.value
-          let user_name = JSON.parse(response.config.data)
-          localStorage.setItem('username-info', user_name.username)
-          localStorage.setItem('password-info', user_name.password)
-
-          if (v === true) {
-            this.$router.push('/home')
-          }
-        })
-        .catch(({ response: err }) => {
-          let v = err.data.value
-          alert('incorrect user')
-          if (v === false) {
-            this.$router.push('/')
-          }
-        })
+    ...mapActions(['fetchdata']),
+    submit() {
+      this.fetchdata({ username: this.username, password: this.password })
+      // await axios
+      //   .post(`https://users.zodexchange.com/api/member/playerLogin`, {
+      //     username: this.username,
+      //     password: this.password,
+      //     siteOrigin: 'zodexchange.com',
+      //   })
+      //   .then((response) => {
+      //     let v = response.data.value
+      //     let user_name = JSON.parse(response.config.data)
+      //     localStorage.setItem('username-info', user_name.username)
+      //     localStorage.setItem('password-info', user_name.password)
+      //     if (v === true) {
+      //       this.$router.push('/home')
+      //     }
+      //   })
+      //   .catch(({ response: err }) => {
+      //     let v = err.data.value
+      //     alert('incorrect user')
+      //     if (v === false) {
+      //       this.$router.push('/')
+      //     }
+      //   })
     },
-    // console.log('value...', result.data.value)
-    // console.log('result...', result)
-
-    // localStorage.setItem(
-    //   'username-info',
-    //   JSON.stringify(result.config.data),
-    //   console.log('<<<<<', result.config.data)
-    // )
-
-    // localStorage.setItem('password-info', JSON.stringify(result.config.data))
-
-    // async created() {
-    // let result = await axios({
-    //   method: 'POST',
-    //   url: 'https://users.zodexchange.com/api/member/playerLogin',
-    //   data: {
-    //     username: 'winp1',
-    //     password: 'abc123',
-    //   },
-    // })
-    // console.log(result)
-    // localStorage.setItem(
-    //   'username-info',
-    //   JSON.stringify(result.data.username),
-    //   console.log('<<<<<', result)
-    // )
-    // localStorage.setItem(
-    //   'password-info',
-    //   JSON.stringify(result.data.password)
-    // )
-    // },
   },
 }
 </script>

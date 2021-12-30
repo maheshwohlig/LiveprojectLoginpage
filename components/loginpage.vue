@@ -17,7 +17,7 @@
               <v-form v-model="isFormValid">
                 <v-text-field
                   prepend-inner-icon="mdi-account"
-                  v-model="username"
+                  v-model="auth.username"
                   label="Username"
                   :rules="rules.username"
                   required
@@ -25,7 +25,7 @@
                 <v-text-field
                   mx="2"
                   id="pass1"
-                  v-model="password"
+                  v-model="auth.password"
                   prepend-inner-icon="mdi-lock"
                   label="Password"
                   :type="show1 ? 'text' : 'password'"
@@ -40,7 +40,7 @@
                   v-bind:style="{ 'background-color': '#f53809' }"
                   block
                   :disabled="!isFormValid"
-                  @click="submit"
+                  @click="submitForm"
                 >
                   login
                 </v-btn>
@@ -78,14 +78,16 @@
 </template>
 
 <script>
-// import axios from 'axios'
-import { mapActions } from 'vuex'
+import axios from 'axios'
+// import { mapActions } from 'vuex'
 
 export default {
   data() {
     return {
-      username: '',
-      password: '',
+      auth: {
+        username: 'winp1',
+        password: 'abc123',
+      },
       show1: false,
       isFormValid: false,
       rules: {
@@ -104,35 +106,63 @@ export default {
       },
     }
   },
-
+  // methods: {
+  //   submitForm() {
+  //     this.$auth.login({
+  //       data: {
+  //         username: this.username,
+  //         password: this.password,
+  //       },
+  //     })
+  //   },
+  // },
   methods: {
-    ...mapActions(['fetchdata']),
-    submit() {
-      this.fetchdata({ username: this.username, password: this.password })
-      // await axios
-      //   .post(`https://users.zodexchange.com/api/member/playerLogin`, {
-      //     username: this.username,
-      //     password: this.password,
-      //     siteOrigin: 'zodexchange.com',
-      //   })
-      //   .then((response) => {
-      //     let v = response.data.value
-      //     let user_name = JSON.parse(response.config.data)
-      //     localStorage.setItem('username-info', user_name.username)
-      //     localStorage.setItem('password-info', user_name.password)
-      //     if (v === true) {
-      //       this.$router.push('/home')
-      //     }
-      //   })
-      //   .catch(({ response: err }) => {
-      //     let v = err.data.value
-      //     alert('incorrect user')
-      //     if (v === false) {
-      //       this.$router.push('/')
-      //     }
-      //   })
+    //   // ...mapActions(['fetchdata']),
+    async submitForm() {
+      // this.fetchdata({ username: this.username, password: this.password })
+
+      await axios
+        .post(`https://users.zodexchange.com/api/member/playerLogin`, {
+          username: this.auth.username,
+          password: this.auth.password,
+          siteOrigin: 'zodexchange.com',
+        })
+        .then((response) => {
+          let vu = JSON.parse(response.config.data)
+
+          let x = vu.username
+          console.log('x', x)
+
+          this.$auth.loginWith(
+            'local',
+            `https://users.zodexchange.com/api/member/playerLogin`,
+            {
+              data: {
+                username: this.auth.username,
+                password: this.auth.password,
+              },
+            }
+          )
+
+          let v = response.data.value
+          let st_data = response.data.data
+
+          localStorage.setItem('username-info', JSON.stringify(st_data))
+
+          if (v === true) {
+            this.$router.push('/home')
+          }
+        })
+        .catch(({ response: err }) => {
+          let v = err.data.value
+          alert('incorrect user')
+          if (v === false) {
+            this.$router.push('/')
+          }
+        })
     },
   },
+  // props: ['submitForm', 'hasName'],
 }
 </script>
 
